@@ -65,23 +65,24 @@
         } from 'lucide-react';
 
         // ==========================================
-        //        CONFIGURACIÓN DE IMÁGENES
+        //        CONFIGURACIÓN DE IMÁGENES (INTELIGENTE)
         // ==========================================
         
-        // CAMBIO: Ahora busca las imágenes en la misma carpeta (sin ./imagenes/)
+        // Esta configuración intenta usar los nombres originales probables.
+        // Si aún así no cargan, verifica en GitHub el nombre EXACTO.
         const assets = {
-            logoSFH: "./logo-sfh.png",
-            logoKeren: "./logo-keren.png",
+            // Intenta nombres comunes si no renombraste
+            logoSFH: "sin_fronteraslogo.PNG", 
+            logoKeren: "keren_zhlogo.PNG",
             
-            // Imágenes específicas
-            fotoHome: "./home_kz.jpg",
-            fotoModal: "./keren_definicion.png", // Asegúrate que la extensión coincida (.png o .jpg)
-            fotoHistoria: "./Kz_historia.jpg",
+            fotoHome: "home_kz.jpg",
+            fotoModal: "keren_definicion.PNG", // Si subiste .PNG.jpg, renómbralo en GitHub a .PNG
+            fotoHistoria: "Kz_historia.jpg",
             
             brands: {
-                cafe: "./logo-cafe.png",
-                comuniser: "./logo-comuniser.png",
-                women: "./logo-women.png"
+                cafe: "cafe_letras_logo.png",
+                comuniser: "comuniser_logo.PNG",
+                women: "womwns_logo.PNG"
             }
         };
 
@@ -118,6 +119,20 @@
             const [bookingModalOpen, setBookingModalOpen] = useState(false);
 
             const [formInterest, setFormInterest] = useState("General");
+
+            // Función auxiliar para manejar errores de imagen
+            const handleImageError = (e, fallbackSrc) => {
+                if (fallbackSrc && e.target.src !== fallbackSrc) {
+                    // Intenta con el nombre alternativo (ej: si falló .png, prueba .PNG)
+                    console.log(`Error cargando imagen, intentando fallback...`);
+                    // Aquí podrías poner lógica para probar extensiones, pero lo más simple
+                    // es ocultar o mostrar un placeholder si falla todo.
+                    e.target.style.display = 'none';
+                    if (e.target.nextSibling) e.target.nextSibling.style.display = 'block';
+                } else {
+                    e.target.style.display = 'none';
+                }
+            };
 
             useEffect(() => {
                 const handleScroll = () => { setIsScrolled(window.scrollY > 50); };
@@ -298,7 +313,7 @@
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative border-4" style={{ borderColor: brandColors.gold }}>
                         <button onClick={() => setFoundationModalOpen(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors z-50"><X size={24} /></button>
                         <div className="p-6 text-center" style={{ backgroundColor: brandColors.blue }}>
-                        <img src={assets.logoKeren} alt="Keren Zohar" className="h-12 w-auto mx-auto mb-2 brightness-0 invert object-contain" onError={(e) => e.target.style.display='none'} />
+                        <img src={assets.logoKeren} alt="Keren Zohar" className="h-12 w-auto mx-auto mb-2 brightness-0 invert object-contain" onError={handleImageError} />
                         <h3 className="text-xl font-bold text-white mb-1">Sé un Zoharista</h3>
                         <p className="text-sm font-semibold" style={{ color: brandColors.gold }}>"Los sueños no tienen fecha de vencimiento"</p>
                         </div>
@@ -364,7 +379,7 @@
                             <div className="w-full md:w-1/2">
                                 <div className="h-16 mb-4 flex items-center">
                                     {/* LOGO FUNDACIÓN */}
-                                    <img src={assets.logoKeren} alt="Fundación Keren Zohar" className="h-full w-auto object-contain" onError={(e) => {e.target.style.display='none';}} />
+                                    <img src={assets.logoKeren} alt="Fundación Keren Zohar" className="h-full w-auto object-contain" onError={handleImageError} />
                                 </div>
                                 <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4 font-sans">Fundación <span style={{ color: brandColors.blue }}>Keren Zohar</span></h2>
                                 <div className="inline-block px-3 py-1 text-white text-sm font-bold rounded mb-6" style={{ backgroundColor: brandColors.gold }}>Modelo de Impacto Integral</div>
@@ -489,7 +504,7 @@
                                 alt="SFH Logo" 
                                 className={`h-full w-auto object-contain transition-all ${isScrolled ? 'brightness-100' : 'brightness-0 invert'}`}
                                 onError={(e) => {
-                                    e.target.style.display = 'none';
+                                    handleImageError(e);
                                     e.target.nextSibling.style.display = 'block';
                                 }}
                             />
@@ -555,7 +570,7 @@
                         <div className="w-full md:w-1/2">
                         {/* LOGO KEREN ZOHAR SECCIÓN */}
                         <div className="mb-4">
-                            <img src={assets.logoKeren} alt="Fundación Keren Zohar" className="h-20 w-auto object-contain" onError={(e) => {e.target.style.display='none';}} />
+                            <img src={assets.logoKeren} alt="Fundación Keren Zohar" className="h-20 w-auto object-contain" onError={handleImageError} />
                         </div>
                         <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
                             Fundación <span style={{ color: brandColors.blue }}>Keren Zohar</span>
