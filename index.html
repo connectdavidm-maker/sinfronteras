@@ -65,24 +65,31 @@
         } from 'lucide-react';
 
         // ==========================================
-        //        CONFIGURACIÓN DE IMÁGENES (INTELIGENTE)
+        //        CONFIGURACIÓN DE IMÁGENES
         // ==========================================
         
-        // Esta configuración intenta usar los nombres originales probables.
-        // Si aún así no cargan, verifica en GitHub el nombre EXACTO.
+        // CAMBIO: Ahora busca las imágenes en la misma carpeta (sin ./imagenes/)
         const assets = {
-            // Intenta nombres comunes si no renombraste
-            logoSFH: "sfh_logo.png", 
-            logoKeren: "kz_logo.png",
+            logoSFH: "./logo-sfh.png",
+            logoKeren: "./logo-keren.png",
             
-            fotoHome: "home_kz.png",
-            fotoModal: "keren_definicion.png", // Si subiste .PNG.jpg, renómbralo en GitHub a .PNG
-            fotoHistoria: "Kz_historia.PNG",
+            // Imágenes específicas
+            fotoHome: "./home_kz.jpg",
+            fotoModal: "./keren_definicion.png", 
+            fotoHistoria: "./Kz_historia.jpg",
             
             brands: {
-                cafe: "logo-cafe.png",
-                comuniser: "logo-comuniser.png",
-                women: "women_logo.png"
+                cafe: "./logo-cafe.png",
+                comuniser: "./logo-comuniser.png",
+                women: "./logo-women.png"
+            },
+
+            // NUEVO: Logos de Empresas Aliadas
+            // Sube tus logos con estos nombres o cámbialos aquí
+            allies: {
+                krea: "./logo-krea.png",
+                uniminuto: "./logo-uniminuto.png",
+                fenalco: "./logo-fenalco.png"
             }
         };
 
@@ -95,13 +102,12 @@
             gold: '#D3AB2A',
         };
 
-        const socialLinks = {
-            sfh: { instagram: "https://www.instagram.com/sinfronterasholding_official
-", facebook: "https://www.facebook.com/profile.php?id=61574084066630#
-", linkedin: "https://www.linkedin.com/in/sin-fronteras-holding/" },
-            foundation: { instagram: "#", facebook: "https://www.facebook.com/profile.php?id=61577571715131#
-", linkedin: "https://www.linkedin.com/company/107706065/admin/dashboard/
-" }
+        // Función auxiliar para manejar errores de imagen
+        const handleImageError = (e) => {
+            e.target.style.display = 'none';
+            if (e.target.nextSibling) {
+                e.target.nextSibling.style.display = 'block';
+            }
         };
 
         const LandingPageSFH = () => {
@@ -123,20 +129,6 @@
             const [bookingModalOpen, setBookingModalOpen] = useState(false);
 
             const [formInterest, setFormInterest] = useState("General");
-
-            // Función auxiliar para manejar errores de imagen
-            const handleImageError = (e, fallbackSrc) => {
-                if (fallbackSrc && e.target.src !== fallbackSrc) {
-                    // Intenta con el nombre alternativo (ej: si falló .png, prueba .PNG)
-                    console.log(`Error cargando imagen, intentando fallback...`);
-                    // Aquí podrías poner lógica para probar extensiones, pero lo más simple
-                    // es ocultar o mostrar un placeholder si falla todo.
-                    e.target.style.display = 'none';
-                    if (e.target.nextSibling) e.target.nextSibling.style.display = 'block';
-                } else {
-                    e.target.style.display = 'none';
-                }
-            };
 
             useEffect(() => {
                 const handleScroll = () => { setIsScrolled(window.scrollY > 50); };
@@ -245,9 +237,11 @@
                 }
             ];
 
+            // ACTUALIZADO: Ahora usa las imágenes definidas en 'assets.allies'
             const allies = [
-                { id: 'krea', title: "KREA Inmobiliaria", icon: <Building2 className="w-12 h-12" /> },
-                { id: 'uniminuto', title: "UNIMINUTO", icon: <BookOpen className="w-12 h-12" /> },
+                { id: 'krea', title: "KREA Inmobiliaria", logo: assets.allies.krea, fallbackIcon: <Building2 className="w-12 h-12" /> },
+                { id: 'uniminuto', title: "UNIMINUTO", logo: assets.allies.uniminuto, fallbackIcon: <BookOpen className="w-12 h-12" /> },
+                { id: 'fenalco', title: "FENALCO", logo: assets.allies.fenalco, fallbackIcon: <Briefcase className="w-12 h-12" /> }
             ];
 
             const memberships = [
@@ -573,7 +567,7 @@
                         <div className="w-full md:w-1/2">
                         {/* LOGO KEREN ZOHAR SECCIÓN */}
                         <div className="mb-4">
-                            <img src={assets.logoKeren} alt="Fundación Keren Zohar" className="h-20 w-auto object-contain" onError={handleImageError} />
+                            <img src={assets.logoKeren} alt="Fundación Keren Zohar" className="h-20 w-auto object-contain" onError={(e) => {e.target.style.display='none';}} />
                         </div>
                         <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
                             Fundación <span style={{ color: brandColors.blue }}>Keren Zohar</span>
@@ -686,10 +680,22 @@
                     <div className="flex flex-wrap justify-center gap-12 items-center mb-12">
                         {allies.map((ally) => (
                         <div key={ally.id} className="group relative w-full md:w-auto max-w-xs text-center p-6 rounded-xl hover:bg-white transition-all duration-300 border border-transparent hover:border-slate-100 hover:shadow-lg flex flex-col items-center">
-                            <div className="text-slate-400 group-hover:text-slate-800 transition-colors">
-                                {ally.icon}
+                            
+                            {/* LOGO EMPRESA ALIADA (Con fallback a icono si falla la imagen) */}
+                            <div className="h-20 w-40 flex items-center justify-center mb-4 text-slate-400 group-hover:text-slate-800 transition-colors">
+                                <img 
+                                    src={ally.logo} 
+                                    alt={ally.title} 
+                                    className="max-h-full max-w-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500"
+                                    onError={(e) => {
+                                        e.target.style.display = 'none';
+                                        e.target.nextSibling.style.display = 'block';
+                                    }}
+                                />
+                                <div className="hidden">{ally.fallbackIcon}</div>
                             </div>
-                            <h4 className="mt-4 font-bold text-slate-800 opacity-60 group-hover:opacity-100 transition-opacity">{ally.title}</h4>
+
+                            <h4 className="mt-2 font-bold text-slate-800 opacity-60 group-hover:opacity-100 transition-opacity">{ally.title}</h4>
                         </div>
                         ))}
                     </div>
@@ -789,8 +795,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
